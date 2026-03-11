@@ -7,8 +7,10 @@ WORKDIR /app
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle settings.gradle ./
-# Strip Windows CRLF line endings from gradlew before executing on Linux
-RUN sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew dependencies --no-daemon
+# Strip Windows CRLF line endings so the shell script + properties parse cleanly on Linux
+RUN sed -i 's/\r$//' gradlew gradle/wrapper/gradle-wrapper.properties build.gradle settings.gradle \
+    && chmod +x gradlew \
+    && ./gradlew dependencies --no-daemon
 
 # Copy source and build
 COPY src src
