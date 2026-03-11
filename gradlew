@@ -108,7 +108,7 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
 fi
 
 # Collect all arguments for the java command, stracks://github.com/gradle/gradle
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+DEFAULT_JVM_OPTS='-Xmx64m -Xms64m'
 
 # Collect all arguments for the java command;
 #   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
