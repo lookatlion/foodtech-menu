@@ -1,0 +1,47 @@
+plugins {
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'java'
+}
+
+group = 'com.restaurant'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web layer
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // WebClient for non-blocking OpenAI HTTP calls
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Bean validation (@Valid, @NotBlank)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // OpenAPI / Swagger UI (Spring Boot 3.x compatible)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+    // Loads .env file into the Spring Environment at startup
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+
+    // MockWebServer — realistic HTTP-layer testing of OpenAI calls
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.12.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

@@ -1,0 +1,15 @@
+# Credentials — never commit the real .env
+.env
+
+# Gradle build outputs
+.gradle/
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

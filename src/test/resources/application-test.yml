@@ -1,0 +1,16 @@
+openai:
+  api-key: test-key
+  base-url: http://localhost:9999
+  model: gpt-4o
+  embedding-model: text-embedding-3-small
+  top-k: 3
+  retry-max-attempts: 0
+  retry-min-backoff-ms: 100
+
+# Prevents MenuDataLoader @PostConstruct from calling OpenAI on startup during tests
+menu:
+  auto-load: false
+
+logging:
+  level:
+    com.restaurant.menuassistant: WARN

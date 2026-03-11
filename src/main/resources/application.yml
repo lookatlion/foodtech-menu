@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: menu-assistant
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  base-url: https://api.openai.com/v1
+  model: gpt-4o
+  embedding-model: text-embedding-3-small
+  top-k: 3
+  retry-max-attempts: 3
+  retry-min-backoff-ms: 1000
+
+menu:
+  auto-load: true
+
+logging:
+  level:
+    com.restaurant.menuassistant: DEBUG
