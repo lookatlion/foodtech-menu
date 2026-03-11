@@ -69,6 +69,8 @@ openai:
   model: gpt-4o                        # LLM model
   embedding-model: text-embedding-3-small
   top-k: 3                             # number of items retrieved per query
+  retry-max-attempts: 3                # retries on 5xx errors (exponential backoff)
+  retry-min-backoff-ms: 1000           # initial backoff duration
 ```
 
 ---
@@ -76,11 +78,22 @@ openai:
 ## Running locally
 
 ```bash
-# Clone and enter the project
-cd menu-assistant
+# 1. Clone the repository
+git clone git@github.com:lookatlion/foodtech-menu.git
+cd foodtech-menu
 
-# Run (API key must be set in environment)
-OPENAI_API_KEY=sk-... ./gradlew bootRun
+# 2. Configure the OpenAI API key (see Configuration section above)
+cp .env.example .env
+# Edit .env and set your real OPENAI_API_KEY
+
+# 3. Run the application
+./gradlew bootRun
+```
+
+On Windows:
+```powershell
+$env:OPENAI_API_KEY = "sk-your-key-here"
+.\gradlew.bat bootRun
 ```
 
 The API starts on `http://localhost:8080`.
