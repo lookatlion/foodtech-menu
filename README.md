@@ -4,7 +4,13 @@ A Java REST API that answers natural language questions about a restaurant menu 
 
 ## Prerequisites
 
+**With Docker (recommended — no Java or Gradle required):**
+- Docker + Docker Compose
+- An [OpenAI API key](https://platform.openai.com/api-keys)
+
+**Without Docker:**
 - Java 21+
+- Gradle 8+ (or use the included `gradlew` wrapper)
 - An [OpenAI API key](https://platform.openai.com/api-keys)
 
 ## Setup
@@ -30,19 +36,27 @@ OPENAI_API_KEY=sk-your-real-key-here
 
 > The `.env` file is git-ignored and will never be committed.
 
-## Run Locally
+## Run
+
+**With Docker (any OS):**
+
+```bash
+docker compose up --build
+```
+
+**Without Docker — macOS / Linux:**
 
 ```bash
 ./gradlew bootRun
 ```
 
-On Windows:
+**Without Docker — Windows:**
 
 ```powershell
 .\gradlew.bat bootRun
 ```
 
-The server starts on **http://localhost:8080**. On first startup it will embed the menu items via the OpenAI API — this takes a few seconds.
+The server starts on **http://localhost:8080**. On first startup it embeds the menu items via the OpenAI API — this takes a few seconds.
 
 ## Run Tests
 

@@ -1,0 +1,9 @@
+services:
+  menu-assistant:
+    build: .
+    ports:
+      - "8080:8080"
+    # Injects all variables from .env as OS environment variables.
+    # Spring Boot resolves ${OPENAI_API_KEY} in application.yml from these.
+    env_file:
+      - .env

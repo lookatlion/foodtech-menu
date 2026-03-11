@@ -1,0 +1,21 @@
+# Never bake credentials into the image layer
+.env
+
+# Gradle/build outputs — Stage 1 builds these fresh
+.gradle/
+build/
+
+# IDE + OS noise
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docs
+README.md
+*.pdf
