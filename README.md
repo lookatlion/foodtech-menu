@@ -1,168 +1,101 @@
-# Menu Assistant — AI-powered RAG API
+# Menu Assistant
 
-A Spring Boot REST API that answers natural language questions about a restaurant menu using **Retrieval Augmented Generation (RAG)**: embeddings, in-memory vector search, and LLM generation.
+A Java REST API that answers natural language questions about a restaurant menu using Retrieval Augmented Generation (RAG).
 
----
-
-## Architecture
-
-```
-POST /api/menu/ask
-       │
-  MenuController          (validates input, delegates to service)
-       │
-  RagService              (orchestrates the pipeline)
-  ├── EmbeddingService    (WebClient → OpenAI /v1/embeddings)
-  ├── InMemoryVectorStore (cosine similarity, top-K retrieval)
-  └── LlmService          (WebClient → OpenAI /v1/chat/completions)
-```
-
-### RAG Pipeline
-
-1. **Startup** — `MenuDataLoader` embeds all 11 menu items via `@PostConstruct` and stores them in the vector index
-2. **Query** — the user's question is embedded using the same model
-3. **Retrieval** — top-3 most similar items are retrieved by cosine similarity
-4. **Generation** — retrieved items + question are sent to the LLM, which returns a natural language recommendation
-
-### Key Design Decisions
-
-| Decision | Rationale |
-|---|---|
-| Spring WebClient over Spring AI | Keeps the RAG flow explicit and easy to review; no hidden abstractions |
-| Layered architecture | Aligns with standard Spring Boot conventions; straightforward for any Java team |
-| In-memory vector store | Dataset is small and static; avoids external dependencies |
-| `@PostConstruct` indexing | Guarantees warm index before first request; predictable startup behaviour |
-| `@ConditionalOnProperty` on `MenuDataLoader` | Cleanly prevents real API calls during test context initialization |
-| Custom exceptions + `@RestControllerAdvice` | Keeps service layers framework-agnostic; consistent structured error responses |
-| Java 21 records | Immutable DTOs and domain objects with zero boilerplate |
-
----
-
-## Requirements
+## Prerequisites
 
 - Java 21+
-- Gradle 8.x (or use `./gradlew`)
-- An OpenAI API key
+- An [OpenAI API key](https://platform.openai.com/api-keys)
 
----
+## Setup
 
-## Configuration
+```bash
+git clone https://github.com/lookatlion/foodtech-menu.git
+cd foodtech-menu
+```
 
-Credentials are loaded from a `.env` file in the project root. Copy the example and fill in your key:
+## Configure OpenAI API Key
+
+Copy the example environment file and add your key:
 
 ```bash
 cp .env.example .env
 ```
 
-Then edit [.env](.env):
+Open `.env` and replace the placeholder with your actual key:
 
 ```
 OPENAI_API_KEY=sk-your-real-key-here
 ```
 
-The `.env` file is listed in `.gitignore` and is never committed. The `.env.example` file is committed as a template for other developers.
+> The `.env` file is git-ignored and will never be committed.
 
-All other settings are in [src/main/resources/application.yml](src/main/resources/application.yml):
-
-```yaml
-openai:
-  model: gpt-4o                        # LLM model
-  embedding-model: text-embedding-3-small
-  top-k: 3                             # number of items retrieved per query
-  retry-max-attempts: 3                # retries on 5xx errors (exponential backoff)
-  retry-min-backoff-ms: 1000           # initial backoff duration
-```
-
----
-
-## Running locally
+## Run Locally
 
 ```bash
-# 1. Clone the repository
-git clone git@github.com:lookatlion/foodtech-menu.git
-cd foodtech-menu
-
-# 2. Configure the OpenAI API key (see Configuration section above)
-cp .env.example .env
-# Edit .env and set your real OPENAI_API_KEY
-
-# 3. Run the application
 ./gradlew bootRun
 ```
 
 On Windows:
+
 ```powershell
-$env:OPENAI_API_KEY = "sk-your-key-here"
 .\gradlew.bat bootRun
 ```
 
-The API starts on `http://localhost:8080`.
+The server starts on **http://localhost:8080**. On first startup it will embed the menu items via the OpenAI API — this takes a few seconds.
 
-Swagger UI is available at: `http://localhost:8080/swagger-ui.html`
-
----
-
-## Running tests
+## Run Tests
 
 ```bash
 ./gradlew test
 ```
 
-Tests never call the real OpenAI API. `application-test.yml` sets `menu.auto-load=false` to prevent embedding generation during context startup, and MockWebServer is used for HTTP-level unit tests.
+Tests do not call the real OpenAI API.
 
----
+## Example Requests
 
-## Example requests
+Once the server is running, copy-paste any of the commands below.
 
-### Vegetarian recommendation
-
-```bash
-curl -s -X POST http://localhost:8080/api/menu/ask \
-  -H "Content-Type: application/json" \
-  -d '{"question": "I am vegetarian and very hungry, what do you recommend?"}' | jq
-```
-
-### Spicy options
+**Ask for a vegetarian recommendation:**
 
 ```bash
 curl -s -X POST http://localhost:8080/api/menu/ask \
   -H "Content-Type: application/json" \
-  -d '{"question": "What spicy dishes do you have?"}' | jq
+  -d '{"question": "I am vegetarian and very hungry, what do you recommend?"}'
 ```
 
-### Drinks
+**Ask about spicy dishes:**
 
 ```bash
 curl -s -X POST http://localhost:8080/api/menu/ask \
   -H "Content-Type: application/json" \
-  -d '{"question": "What drinks are available?"}' | jq
+  -d '{"question": "What spicy dishes do you have?"}'
 ```
 
-### Example response
+**Ask about drinks:**
+
+```bash
+curl -s -X POST http://localhost:8080/api/menu/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What drinks are available?"}'
+```
+
+**Ask about desserts:**
+
+```bash
+curl -s -X POST http://localhost:8080/api/menu/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Do you have any desserts or sweet options?"}'
+```
+
+### Sample Response
 
 ```json
 {
-  "answer": "For a vegetarian looking for something filling, I'd recommend the Veggie Burger — a plant-based burger with lettuce, tomato and vegan sauce. The Falafel Wrap is also a great option: falafel balls with tahini, lettuce and tomato in a pita. Both are satisfying and entirely plant-based.",
+  "answer": "I recommend trying our Veggie Burger, which features a delicious plant-based patty topped with lettuce, tomato, and vegan sauce. The Falafel Wrap is also a great choice, filled with flavorful falafel balls, tahini sauce, lettuce, and tomato. Both options are filling and vegetarian-friendly!",
   "relevantItems": [
     "Veggie Burger",
     "Falafel Wrap",
     "Greek Salad"
   ]
 }
-```
-
-### Validation error (400)
-
-```bash
-curl -s -X POST http://localhost:8080/api/menu/ask \
-  -H "Content-Type: application/json" \
-  -d '{"question": ""}' | jq
-```
-
-```json
-{
-  "error": "Question must not be blank"
-}
-```
-
----
